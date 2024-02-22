@@ -1,34 +1,34 @@
+#These imports deal with the file handeling and hdf5 file opening.
 import h5py
 import os,sys
 import numpy as np
 import ast
-
-
 import matplotlib.pyplot as plt
 #For creating a movie
 from matplotlib.animation import FuncAnimation
 
 #Contants
 pc = 3.086*10**(16) ##[m]
-
+#Sets the directory to the current location
 os.chdir(os.getcwd())
-
+#Find all the files in the listed directory. 
 files = os.listdir()
+#Defines a filter that removes all none snapshot files from the list.
 def filter_files(file):
     if (file[0:10] == "disc_patch"):
         return True
     else:
         return False
-
+#Recieves filtered list
 filtered_files = np.sort(list(filter(filter_files,files)))
 
+
+#Code to create a grid from the HDF5 file (Not my code)
 def get_tb_grid(grid,subgriddim,gridsize):
     result = np.zeros((gridsize[0],gridsize[1],gridsize[2]))
-
     cx = int(gridsize[0]/subgriddim[0])
     cy = int(gridsize[1]/subgriddim[1])
     cz = int(gridsize[2]/subgriddim[2])
-
     startchunk = 0
     endchunk = cx*cy*cz
     ix = 0
@@ -47,17 +47,15 @@ def get_tb_grid(grid,subgriddim,gridsize):
                 iy = 0
                 ix += cx
     return result
-
+#Also mostly not my code but uses the hdf5 file to get relevant data.
 def DataGetter(filename, keys = False):
     with h5py.File(filename) as file:
         #get simulation box dimension in SI and pc
         box = np.array(file["/Header"].attrs["BoxSize"])
         box_pc = box/pc
-
         #Get the time when the snapshot was saved in SI(S) and 
         time = (file["/Header"].attrs["Time"])
         time_Myr = time/(3600*24*365.25*1000000)
-        
         #get gridcell dimensions 
         grid = ast.literal_eval(file["/Parameters"].attrs["DensityGrid:number of cells"].decode("utf-8") )
         grid = np.array(grid)
@@ -66,27 +64,21 @@ def DataGetter(filename, keys = False):
         subgrids = np.array(subgrids)
         #voxel side length SI
         pix_size = box[0]/grid[0]
-    
-    
         #simulation data stored in here
         filepart = file['PartType0']
-    
         #this should print all available datasets eg. 'Temperature' 'NumberDensity' etc..
         if keys:
             print("File groups:",file.keys())
             print("Attributes inside Header:",file["/Header"].attrs.keys())
             print("Measured quantiies:",filepart.keys())
-    
-        #then get the datasets by... 
-    
+        #then get the datasets by...
         ntot = get_tb_grid(filepart['NumberDensity'],subgrids,grid)
         #which gives the full Cartesian grid
         tempGrid = get_tb_grid(filepart["Temperature"],subgrids,grid)
         NeutralFractionGrid  = get_tb_grid(filepart["NeutralFractionH"],subgrids,grid)
         IonisedHydrogenGrid = ntot*(1-NeutralFractionGrid)
-        
         return ntot, tempGrid,IonisedHydrogenGrid,box_pc,time_Myr
-
+#This updates the animation. Pass the filename and it retrives the relevant data and updates the sidebars.
 def Update(filename):
     NewData = DataGetter(filename)
     im1.set_data(NewData[0].sum(0))
@@ -100,17 +92,14 @@ def Update(filename):
 
 fig, ax = plt.subplots(1,3,figsize=(15,5))
 
-
+#Labels the python figures
 ax[0].set_title("Total Number Density")
 ax[1].set_title("Number Density of H+")
 ax[2].set_title("Temperature")
-
 ax[0].set_xlabel("Pc")
 ax[0].set_ylabel("Pc")
-
 ax[1].set_xlabel("Pc")
 ax[1].set_ylabel("Pc")
-
 ax[2].set_xlabel("Pc")
 ax[2].set_ylabel("Pc")
 
