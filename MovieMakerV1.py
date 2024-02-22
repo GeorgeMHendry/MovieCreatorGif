@@ -122,9 +122,11 @@ bar2 = plt.colorbar(im3)
 #This creates the animation using the Update function, and starts from 0th frame. Outputs the file as Movie.gif
 print("Starting Movie Creation")
 animation2 = animation.FuncAnimation(fig=fig, func = Update, frames = filtered_files) 
-animation2.save("Movie.gif", fps = 15)
+animation2.save("LinearMovie.gif", fps = 15)
 print("Created Movie: Done!")
+fig.show()
 
+fig, ax = plt.subplots(1,3,figsize=(15,5))
 data = DataGetter(filtered_files[0],False)
 BoxDim = data[3]
 TimeMyr = data[4]
@@ -143,5 +145,5 @@ bar2 = plt.colorbar(im3)
 #This creates the animation using the Update function, and starts from 0th frame. Outputs the file as Movie.gif
 print("Starting Movie Creation")
 animation2 = animation.FuncAnimation(fig=fig, func = Update, frames = filtered_files) 
-animation2.save("Movie.gif", fps = 15)
+animation2.save("LogMovie.gif", fps = 15)
 print("Created Movie: Done!")
