@@ -5,7 +5,7 @@ import numpy as np
 import ast
 import matplotlib.pyplot as plt
 #For creating a movie
-from matplotlib.animation import FuncAnimation
+import matplotlib.animation as animation
 
 #Contants
 pc = 3.086*10**(16) ##[m]
