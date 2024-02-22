@@ -124,3 +124,24 @@ print("Starting Movie Creation")
 animation2 = animation.FuncAnimation(fig=fig, func = Update, frames = filtered_files) 
 animation2.save("Movie.gif", fps = 15)
 print("Created Movie: Done!")
+
+data = DataGetter(filtered_files[0],False)
+BoxDim = data[3]
+TimeMyr = data[4]
+plt.suptitle(f"{TimeMyr:.3f} Myr")
+im1 = ax[0].imshow((data[0].sum(0)), extent = [-BoxDim[1]/2 , BoxDim[1]/2,-BoxDim[2]/2 , BoxDim[2]/2], 
+                   cmap = "hot",aspect = "equal",norm = "log") 
+im2 = ax[2].imshow((data[1].sum(0)), extent = [-BoxDim[1]/2 , BoxDim[1]/2,-BoxDim[2]/2 , BoxDim[2]/2], 
+                   cmap = "hot",aspect = "equal",norm = "log")
+im3 = ax[1].imshow((data[2].sum(0)), extent = [-BoxDim[1]/2 , BoxDim[1]/2,-BoxDim[2]/2 , BoxDim[2]/2], 
+                   cmap = "hot",aspect = "equal", norm = "log")
+
+bar = plt.colorbar(im1)
+bar1 = plt.colorbar(im2)
+bar2 = plt.colorbar(im3)
+
+#This creates the animation using the Update function, and starts from 0th frame. Outputs the file as Movie.gif
+print("Starting Movie Creation")
+animation2 = animation.FuncAnimation(fig=fig, func = Update, frames = filtered_files) 
+animation2.save("Movie.gif", fps = 15)
+print("Created Movie: Done!")
